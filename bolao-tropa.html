@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bolão Tropa do Orangotango 🦧</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1b2a4a;min-height:100vh}
+:root{
+  --navy:#1b2a4a;--blue:#2563eb;--blue-light:#dbeafe;
+  --gold:#f59e0b;--gold-bg:#fef3c7;
+  --green:#16a34a;--green-bg:#dcfce7;
+  --gray:#64748b;--border:#e2e8f0;--white:#ffffff;
+  --radius:12px;
+}
+.app{max-width:860px;margin:0 auto;padding:16px}
+.header{background:var(--navy);border-radius:16px;padding:28px 24px 22px;margin-bottom:20px;text-align:center;color:#fff}
+.header-emoji{font-size:32px;margin-bottom:8px}
+.header h1{font-size:clamp(18px,4vw,26px);font-weight:800;letter-spacing:-.3px}
+.header h1 span{color:var(--gold)}
+.header-sub{font-size:13px;color:#94a3b8;margin-top:5px}
+.tabs{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:18px;overflow-x:auto}
+.tab{flex:1;padding:9px 6px;border:none;background:transparent;color:var(--gray);font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .18s;font-family:inherit}
+.tab.active{background:var(--navy);color:#fff}
+.tab:hover:not(.active){background:#f1f5f9}
+.ranking-list{display:flex;flex-direction:column;gap:10px}
+.rank-card{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;flex-wrap:wrap;transition:box-shadow .15s}
+.rank-card:hover{box-shadow:0 2px 12px rgba(27,42,74,.1)}
+.rank-card.gold-card{border-color:#f59e0b;background:linear-gradient(135deg,#fff,#fffbeb)}
+.rank-card.silver-card{border-color:#94a3b8;background:linear-gradient(135deg,#fff,#f8fafc)}
+.rank-card.bronze-card{border-color:#b45309;background:linear-gradient(135deg,#fff,#fffbeb)}
+.rank-pos{font-size:22px;width:30px;text-align:center;flex-shrink:0}
+.rank-avatar{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.rank-info{flex:1;min-width:130px}
+.rank-name{font-weight:700;font-size:14px;color:var(--navy)}
+.rank-detail{font-size:11px;color:var(--gray);margin-top:2px}
+.rank-scores{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.score-pill{display:flex;flex-direction:column;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:6px 10px;min-width:52px}
+.score-pill .sv{font-size:16px;font-weight:700;color:var(--navy)}
+.score-pill .sl{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+.score-pill.mm .sv{color:var(--blue)}
+.score-pill.bn .sv{color:var(--gold)}
+.total-pill{background:var(--navy);color:#fff;font-size:16px;font-weight:800;padding:8px 16px;border-radius:20px;min-width:72px;text-align:center}
+.phase-header{display:flex;align-items:center;gap:10px;margin:20px 0 10px}
+.phase-line{flex:1;height:1px;background:var(--border)}
+.phase-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.pts-badge{background:var(--blue-light);color:var(--blue);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.jogos-list{display:flex;flex-direction:column;gap:8px}
+.jogo-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.jogo-top{display:flex;align-items:center;gap:8px}
+.jogo-data{font-size:10px;color:var(--gray);background:#f1f5f9;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.jogo-teams{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.team{font-weight:600;font-size:13px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--navy)}
+.team.r{text-align:right}
+.vs-txt{font-size:11px;color:#cbd5e1;flex-shrink:0;font-weight:600}
+.result-chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.result-chip.done{background:var(--green-bg);color:var(--green)}
+.result-chip.pend{background:#f1f5f9;color:var(--gray)}
+.palpites-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.pchip{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:14px;font-size:11px;background:#f8fafc;border:1px solid var(--border)}
+.pchip .pn{color:var(--gray);margin-right:2px}
+.pchip .pt{font-weight:600;color:var(--navy)}
+.pchip.hit{background:var(--green-bg);border-color:#86efac}
+.pchip.hit .pn{color:#15803d}
+.pchip.hit .pt{color:var(--green)}
+.pchip .pp{font-size:10px;color:var(--gold);font-weight:700;margin-left:2px}
+.edit-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap}
+.edit-row label{font-size:11px;color:var(--gray);white-space:nowrap}
+select.sel{background:#fff;border:1px solid var(--border);color:var(--navy);padding:6px 10px;border-radius:8px;font-size:12px;font-family:inherit;flex:1;cursor:pointer;min-width:140px}
+button.btn-save{background:var(--navy);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+button.btn-save:hover{opacity:.85}
+button.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.admin-bar{display:flex;justify-content:flex-end;margin-bottom:12px}
+button.btn-admin{background:#fff;border:1px solid var(--border);color:var(--gray);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px}
+button.btn-admin.on{border-color:var(--gold);color:#b45309;background:var(--gold-bg)}
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.fchip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--gray);cursor:pointer;font-family:inherit;transition:all .15s}
+.fchip.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.bonus-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.bonus-card h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray);margin-bottom:3px}
+.bonus-pts-tag{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:12px;display:block}
+.bonus-result-ok{background:var(--green-bg);color:var(--green);font-weight:700;font-size:13px;padding:7px 12px;border-radius:8px;margin-bottom:12px}
+.bonus-result-empty{background:#f8fafc;color:var(--gray);font-size:12px;padding:7px 12px;border-radius:8px;margin-bottom:12px}
+.bonus-palpites{display:flex;flex-direction:column;gap:5px}
+.bpal{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:8px;background:#f8fafc}
+.bpal.won{background:var(--green-bg);border:1px solid #86efac}
+.bpal .bn{font-size:12px;color:var(--gray)}
+.bpal .bv{font-size:12px;font-weight:600;color:var(--navy)}
+.bpal.won .bv{color:var(--green)}
+.bpal .bp{font-size:10px;color:var(--gold);font-weight:700}
+.bonus-input-row{display:flex;gap:6px;margin-bottom:10px}
+input.bonus-inp{background:#fff;border:1px solid var(--border);color:var(--navy);padding:7px 10px;border-radius:8px;font-size:12px;font-family:inherit;flex:1}
+input.bonus-inp::placeholder{color:#cbd5e1}
+.palpitar-header{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.palpitar-header label{font-size:12px;color:var(--gray);white-space:nowrap}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.6);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(2px)}
+.modal{background:#fff;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-emoji{font-size:40px;margin-bottom:12px}
+.modal h2{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.modal p{font-size:13px;color:var(--gray);margin-bottom:20px}
+.modal input{width:100%;background:#f8fafc;border:1px solid var(--border);color:var(--navy);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;text-align:center;letter-spacing:2px}
+.modal input:focus{outline:none;border-color:var(--blue)}
+.modal .btn-login{width:100%;background:var(--navy);color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.modal .btn-cancel{background:none;border:none;color:var(--gray);font-size:13px;cursor:pointer;margin-top:10px;font-family:inherit;text-decoration:underline}
+.modal .error-msg{font-size:12px;color:#dc2626;margin-bottom:8px}
+.admin-indicator{background:var(--gold-bg);border:1px solid var(--gold);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:#b45309;display:flex;align-items:center;gap:6px}
+.loading-bar{text-align:center;padding:60px 20px;color:var(--gray);font-size:14px}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-badge{position:fixed;bottom:16px;right:16px;background:var(--green-bg);border:1px solid #86efac;color:var(--green);font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50}
+.sync-badge.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app" id="app"><div class="loading-bar"><div class="spinner"></div><br/>Carregando bolão...</div></div>
+<div class="sync-badge" id="sync-badge">✓ Salvo na nuvem</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZjEeC8JJbl3bLICJLGq89aw347aBQaCo",
+  authDomain: "bolao-tropa.firebaseapp.com",
+  projectId: "bolao-tropa",
+  storageBucket: "bolao-tropa.firebasestorage.app",
+  messagingSenderId: "525801776413",
+  appId: "1:525801776413:web:418b73eb4ed95fec2dedf4",
+  measurementId: "G-3JRDFEFSM3"
+};
+
+const fireApp = initializeApp(firebaseConfig);
+const db = getFirestore(fireApp);
+const DOC_REF = doc(db, 'bolao', 'dados');
+
+/* ─── DADOS FIXOS ─── */
+const SENHA_ADMIN = 'macacochefe';
+
+const P = [
+  {id:'jp', full:'João Pedro Sanglard', init:'JP', grupos:146, artilheiro:'Kane',             melhor:'Vinicius Jr',  surpresa:'Paraguai'},
+  {id:'rv', full:'Rafael Veiga Rangel', init:'RV', grupos:146, artilheiro:'Kane',             melhor:'Vini Jr',      surpresa:'Japão'},
+  {id:'fb', full:'Felipe de Bois Soares',init:'FB',grupos:143, artilheiro:'Mbappé',           melhor:'Mbappé',       surpresa:'Marrocos'},
+  {id:'lg', full:'Luis Guilherme Gomes',init:'LG', grupos:140, artilheiro:'Cristiano Ronaldo',melhor:'Mbappé',       surpresa:'Japão'},
+  {id:'jl', full:'João Luís',           init:'JL', grupos:140, artilheiro:'Cristiano Ronaldo',melhor:'Vinicius Jr',  surpresa:'Paraguai'},
+];
+
+const PHASES = [
+  {id:'r16', label:'16avos de final',  pts:10},
+  {id:'r8',  label:'Oitavas de final', pts:15},
+  {id:'qf',  label:'Quartas de final', pts:20},
+  {id:'sf',  label:'Semifinais',       pts:25},
+  {id:'f',   label:'Final',            pts:50},
+];
+
+const BONUS = [
+  {id:'artilheiro', label:'Artilheiro',       pts:20},
+  {id:'melhor',     label:'Melhor Jogador',   pts:20},
+  {id:'surpresa',   label:'Seleção Surpresa', pts:15},
+];
+
+const JOGOS_BASE = [
+  {id:'r16_01',fase:'r16',t1:'África do Sul',  t2:'Canadá',        data:'28/06'},
+  {id:'r16_02',fase:'r16',t1:'Brasil',          t2:'Japão',         data:'29/06'},
+  {id:'r16_03',fase:'r16',t1:'Alemanha',        t2:'Paraguai',      data:'29/06'},
+  {id:'r16_04',fase:'r16',t1:'Holanda',         t2:'Marrocos',      data:'29/06'},
+  {id:'r16_05',fase:'r16',t1:'Costa do Marfim', t2:'Noruega',       data:'30/06'},
+  {id:'r16_06',fase:'r16',t1:'França',          t2:'Suécia',        data:'30/06'},
+  {id:'r16_07',fase:'r16',t1:'México',          t2:'Equador',       data:'30/06'},
+  {id:'r16_08',fase:'r16',t1:'Inglaterra',      t2:'RD Congo',      data:'01/07'},
+  {id:'r16_09',fase:'r16',t1:'Bélgica',         t2:'Senegal',       data:'01/07'},
+  {id:'r16_10',fase:'r16',t1:'Estados Unidos',  t2:'Bósnia-Herz.',  data:'01/07'},
+  {id:'r16_11',fase:'r16',t1:'Espanha',         t2:'Áustria',       data:'02/07'},
+  {id:'r16_12',fase:'r16',t1:'Croácia',         t2:'Portugal',      data:'02/07'},
+  {id:'r16_13',fase:'r16',t1:'Suíça',           t2:'Argélia',       data:'03/07'},
+  {id:'r16_14',fase:'r16',t1:'Austrália',       t2:'Egito',         data:'03/07'},
+  {id:'r16_15',fase:'r16',t1:'Argentina',       t2:'Cabo Verde',    data:'03/07'},
+  {id:'r16_16',fase:'r16',t1:'Colômbia',        t2:'Gana',          data:'03/07'},
+  {id:'r8_01', fase:'r8', t1:'Canadá',         t2:'Marrocos',   data:'05/07'},
+  {id:'r8_02', fase:'r8', t1:'Paraguai',        t2:'França',     data:'05/07'},
+  {id:'r8_03', fase:'r8', t1:'Brasil',          t2:'Noruega',    data:'06/07'},
+  {id:'r8_04', fase:'r8', t1:'México',          t2:'Inglaterra', data:'06/07'},
+  {id:'r8_05', fase:'r8', t1:'Portugal',        t2:'Espanha',    data:'06/07'},
+  {id:'r8_06', fase:'r8', t1:'Estados Unidos',  t2:'Bélgica',    data:'06/07'},
+  {id:'r8_07', fase:'r8', t1:'Argentina',       t2:'Egito',      data:'07/07'},
+  {id:'r8_08', fase:'r8', t1:'Suíça',           t2:'Colômbia',   data:'07/07'},
+  {id:'qf_01', fase:'qf', t1:'França',         t2:'Marrocos',      data:'09/07'},
+  {id:'qf_02', fase:'qf', t1:'Espanha',        t2:'Bélgica',       data:'10/07'},
+  {id:'qf_03', fase:'qf', t1:'Noruega',        t2:'Inglaterra',    data:'11/07'},
+  {id:'qf_04', fase:'qf', t1:'Argentina',      t2:'Suíça',         data:'11/07'},
+  {id:'sf_01', fase:'sf', t1:'França',         t2:'Espanha',       data:'14/07'},
+  {id:'sf_02', fase:'sf', t1:'Inglaterra',     t2:'Argentina',     data:'15/07'},
+  {id:'f_02',  fase:'f',  t1:'França / Espanha', t2:'Inglaterra / Argentina', data:'19/07', opts:['França','Espanha','Inglaterra','Argentina']},
+];
+
+/* ─── STATE ─── */
+let S = {
+  tab: 'ranking', filter: 'all', admin: false,
+  showLoginModal: false, loginError: false,
+  selectedPid: 'jp',
+  jogos: JOGOS_BASE.map(j => ({...j, resultado: null, palpites: {}})),
+  bonus: {artilheiro: '', melhor: '', surpresa: ''},
+};
+
+/* ─── FIREBASE SYNC ─── */
+let saving = false;
+
+async function saveToCloud() {
+  if (saving) return;
+  saving = true;
+  try {
+    await setDoc(DOC_REF, {
+      jogos: S.jogos,
+      bonus: S.bonus,
+      updatedAt: Date.now()
+    });
+    showSyncBadge();
+  } catch(e) { console.error('Erro ao salvar:', e); }
+  saving = false;
+}
+
+function showSyncBadge() {
+  const b = document.getElementById('sync-badge');
+  if (!b) return;
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 2000);
+}
+
+// Escuta mudanças em tempo real
+onSnapshot(DOC_REF, (snap) => {
+  const ps = document.getElementById('pal_pid');
+  if (ps) S.selectedPid = ps.value;
+
+  if (snap.exists()) {
+    const d = snap.data();
+    if (d.bonus) S.bonus = d.bonus;
+    if (d.jogos) {
+      // Sempre usa t1/t2/data/opts do JOGOS_BASE (código), só preserva resultado e palpites do Firebase
+      const jogosMesclados = JOGOS_BASE.map(base => {
+        const salvo = d.jogos.find(j => j.id === base.id);
+        if (salvo) {
+          return { ...base, resultado: salvo.resultado || null, palpites: salvo.palpites || {} };
+        }
+        return { ...base, resultado: null, palpites: {} };
+      });
+      S.jogos = jogosMesclados;
+      // Verifica se algum t1/t2 no Firebase está desatualizado e salva se necessário
+      const desatualizado = d.jogos.some(j => {
+        const base = JOGOS_BASE.find(b => b.id === j.id);
+        return base && (j.t1 !== base.t1 || j.t2 !== base.t2);
+      });
+      if (desatualizado) saveToCloud();
+    }
+    render();
+  } else {
+    saveToCloud();
+    render();
+  }
+});
+
+/* ─── HELPERS ─── */
+const bpal = (pid, bid) => P.find(x => x.id === pid)[bid] || '';
+const getOpts = j => j.opts || [j.t1, j.t2];
+
+function calcTotal(pid) {
+  let t = P.find(p => p.id === pid).grupos;
+  S.jogos.forEach(j => {
+    if (j.resultado && j.palpites[pid] === j.resultado)
+      t += PHASES.find(ph => ph.id === j.fase).pts;
+  });
+  BONUS.forEach(b => {
+    const r = S.bonus[b.id];
+    if (r && bpal(pid, b.id).toLowerCase() === r.toLowerCase()) t += b.pts;
+  });
+  return t;
+}
+function mmPts(pid) {
+  return S.jogos.filter(j => j.resultado && j.palpites[pid] === j.resultado)
+    .reduce((a, j) => a + PHASES.find(ph => ph.id === j.fase).pts, 0);
+}
+function bonusPts(pid) {
+  let t = 0;
+  BONUS.forEach(b => {
+    const r = S.bonus[b.id];
+    if (r && bpal(pid, b.id).toLowerCase() === r.toLowerCase()) t += b.pts;
+  });
+  return t;
+}
+
+/* ─── RENDER ─── */
+function render() {
+  const app = document.getElementById('app');
+  const ranked = P.map(p => ({...p, total: calcTotal(p.id)})).sort((a,b) => b.total - a.total);
+  const medals = ['🥇','🥈','🥉'];
+
+  let h = `
+  <div class="header">
+    <div class="header-emoji">🦧 ⚽ 🏆</div>
+    <h1>Bolão <span>Tropa do Orangotango</span></h1>
+    <div class="header-sub">Copa do Mundo 2026 — Fase eliminatória</div>
+  </div>
+  <div class="tabs">
+    <button class="tab ${S.tab==='ranking'?'active':''}" onclick="T('ranking')">🏆 Ranking</button>
+    <button class="tab ${S.tab==='jogos'?'active':''}" onclick="T('jogos')">⚽ Jogos</button>
+    <button class="tab ${S.tab==='bonus'?'active':''}" onclick="T('bonus')">⭐ Bônus</button>
+    ${S.admin ? `<button class="tab ${S.tab==='palpitar'?'active':''}" onclick="T('palpitar')">✏️ Palpitar</button>` : ''}
+  </div>`;
+
+  /* RANKING */
+  if (S.tab === 'ranking') {
+    h += `<div class="ranking-list">`;
+    ranked.forEach((p, i) => {
+      const cls = i===0?'gold-card':i===1?'silver-card':i===2?'bronze-card':'';
+      const mm = mmPts(p.id); const bn = bonusPts(p.id);
+      h += `<div class="rank-card ${cls}">
+        <div class="rank-pos">${medals[i]||`${i+1}º`}</div>
+        <div class="rank-avatar">${p.init}</div>
+        <div class="rank-info">
+          <div class="rank-name">${p.full}</div>
+          <div class="rank-detail">Grupos: ${p.grupos} pts${mm?` · Mata-mata: +${mm}`:''}${bn?` · Bônus: +${bn}`:''}</div>
+        </div>
+        <div class="rank-scores">
+          <div class="score-pill"><span class="sv">${p.grupos}</span><span class="sl">Grupos</span></div>
+          <div class="score-pill mm"><span class="sv">+${mm}</span><span class="sl">Mata-mata</span></div>
+          <div class="score-pill bn"><span class="sv">+${bn}</span><span class="sl">Bônus</span></div>
+          <div class="total-pill">${p.total}</div>
+        </div>
+      </div>`;
+    });
+    h += `</div>`;
+    h += `<div style="display:flex;justify-content:center;margin-top:24px">`;
+    if (S.admin) {
+      h += `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
+        <div class="admin-indicator">🔓 Modo admin ativo</div>
+<button class="btn-admin" onclick="S.admin=false;T('ranking')">Sair do admin</button>
+      </div>`;
+    } else {
+      h += `<button class="btn-admin" onclick="openLogin()">🔒 Entrar como admin</button>`;
+    }
+    h += `</div>`;
+  }
+
+  /* JOGOS */
+  if (S.tab === 'jogos') {
+    if (S.admin) h += `<div class="admin-bar"><div class="admin-indicator">🔓 Modo admin — insira os resultados</div></div>`;
+    h += `<div class="filter-row"><button class="fchip ${S.filter==='all'?'active':''}" onclick="F('all')">Todos</button>`;
+    PHASES.forEach(ph => h += `<button class="fchip ${S.filter===ph.id?'active':''}" onclick="F('${ph.id}')">${ph.label}</button>`);
+    h += `</div>`;
+    PHASES.forEach(ph => {
+      if (S.filter !== 'all' && S.filter !== ph.id) return;
+      h += `<div class="phase-header"><div class="phase-line"></div><div class="phase-label">${ph.label}<span class="pts-badge">${ph.pts} pts</span></div><div class="phase-line"></div></div><div class="jogos-list">`;
+      S.jogos.filter(j => j.fase === ph.id).forEach(j => {
+        h += `<div class="jogo-card">
+          <div class="jogo-top">
+            <span class="jogo-data">${j.data}</span>
+            <div class="jogo-teams"><span class="team">${j.t1}</span><span class="vs-txt">×</span><span class="team r">${j.t2}</span></div>
+            ${j.resultado?`<span class="result-chip done">✓ ${j.resultado}</span>`:`<span class="result-chip pend">Aguardando</span>`}
+          </div>
+          <div class="palpites-row">`;
+        P.forEach(p => {
+          const pal = j.palpites[p.id]; const hit = j.resultado && pal === j.resultado;
+          h += `<div class="pchip ${hit?'hit':''}"><span class="pn">${p.full}</span><span class="pt">${pal||'—'}</span>${hit?`<span class="pp">+${ph.pts}</span>`:''}</div>`;
+        });
+        h += `</div>`;
+        if (S.admin) h += `<div class="edit-row"><label>Resultado:</label>
+          <select class="sel" id="sel_${j.id}"><option value="">-- selecione --</option>
+          ${getOpts(j).map(o=>`<option value="${o}"${j.resultado===o?' selected':''}>${o}</option>`).join('')}
+          </select><button class="btn-save" onclick="saveRes('${j.id}')">Salvar</button></div>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+    });
+  }
+
+  /* BONUS */
+  if (S.tab === 'bonus') {
+    if (S.admin) h += `<div class="admin-bar"><div class="admin-indicator">🔓 Modo admin — insira os resultados</div></div>`;
+    h += `<div class="bonus-grid">`;
+    BONUS.forEach(b => {
+      const res = S.bonus[b.id];
+      h += `<div class="bonus-card"><h3>${b.label}</h3><span class="bonus-pts-tag">Vale ${b.pts} pontos</span>`;
+      if (S.admin) h += `<div class="bonus-input-row"><input class="bonus-inp" id="bonus_${b.id}" value="${res}" placeholder="Resultado oficial..."/><button class="btn-save" onclick="saveBonus('${b.id}')">✓</button></div>`;
+      else h += res ? `<div class="bonus-result-ok">✓ ${res}</div>` : `<div class="bonus-result-empty">Resultado não definido ainda</div>`;
+      h += `<div class="bonus-palpites">`;
+      P.forEach(p => {
+        const pv = bpal(p.id, b.id); const won = res && pv.toLowerCase() === res.toLowerCase();
+        h += `<div class="bpal ${won?'won':''}"><span class="bn">${p.full}</span><span class="bv">${pv}</span>${won?`<span class="bp">+${b.pts}</span>`:''}</div>`;
+      });
+      h += `</div></div>`;
+    });
+    h += `</div>`;
+  }
+
+  /* PALPITAR (admin) */
+  if (S.tab === 'palpitar' && S.admin) {
+    h += `<div class="palpitar-header">
+      <div class="admin-indicator">🔓 Admin</div>
+      <label>Participante:</label>
+      <select class="sel" id="pal_pid" onchange="syncPals()" style="max-width:280px">
+        ${P.map(p=>`<option value="${p.id}" ${p.id===S.selectedPid?'selected':''}>${p.full}</option>`).join('')}
+      </select>
+    </div>`;
+    PHASES.forEach(ph => {
+      h += `<div class="phase-header"><div class="phase-line"></div><div class="phase-label">${ph.label}<span class="pts-badge">${ph.pts} pts</span></div><div class="phase-line"></div></div><div class="jogos-list">`;
+      S.jogos.filter(j => j.fase === ph.id).forEach(j => {
+        h += `<div class="jogo-card">
+          <div class="jogo-top">
+            <span class="jogo-data">${j.data}</span>
+            <div class="jogo-teams"><span class="team">${j.t1}</span><span class="vs-txt">×</span><span class="team r">${j.t2}</span></div>
+          </div>
+          <div class="edit-row"><label>Palpite:</label>
+            <select class="sel" id="pal_${j.id}"><option value="">-- escolher --</option>
+            ${getOpts(j).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>
+            <button class="btn-save" onclick="savePal('${j.id}')">Salvar</button>
+          </div>
+        </div>`;
+      });
+      h += `</div>`;
+    });
+  }
+
+  /* MODAL LOGIN */
+  if (S.showLoginModal) {
+    h += `<div class="modal-overlay" onclick="closeLoginOutside(event)">
+      <div class="modal">
+        <div class="modal-emoji">🦧</div>
+        <h2>Área do Admin</h2>
+        <p>Digite a senha pra entrar no modo de edição</p>
+        ${S.loginError ? `<div class="error-msg">Senha incorreta, tente novamente</div>` : ''}
+        <input type="password" id="senha-input" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')tryLogin()"/>
+        <button class="btn-login" onclick="tryLogin()">Entrar</button><br/>
+        <button class="btn-cancel" onclick="closeLogin()">Cancelar</button>
+      </div>
+    </div>`;
+  }
+
+  app.innerHTML = h;
+  if (S.tab === 'palpitar' && S.admin) syncPals();
+  if (S.showLoginModal) { const i = document.getElementById('senha-input'); if(i) i.focus(); }
+}
+
+/* ─── AÇÕES (globais) ─── */
+window.T = t => { S.tab = t; render(); };
+window.F = f => { S.filter = f; render(); };
+window.openLogin = () => { S.showLoginModal = true; S.loginError = false; render(); };
+window.closeLogin = () => { S.showLoginModal = false; S.loginError = false; render(); };
+window.closeLoginOutside = e => { if (e.target.classList.contains('modal-overlay')) closeLogin(); };
+window.tryLogin = () => {
+  const i = document.getElementById('senha-input'); if (!i) return;
+  if (i.value === SENHA_ADMIN) { S.admin = true; S.showLoginModal = false; S.loginError = false; render(); }
+  else { S.loginError = true; render(); }
+};
+window.saveRes = async jid => {
+  const s = document.getElementById('sel_' + jid); if (!s) return;
+  const j = S.jogos.find(x => x.id === jid); if (!j) return;
+  j.resultado = s.value || null;
+  await saveToCloud(); render();
+};
+window.saveBonus = async bid => {
+  const i = document.getElementById('bonus_' + bid); if (!i) return;
+  S.bonus[bid] = i.value.trim();
+  await saveToCloud(); render();
+};
+window.syncPals = () => {
+  const ps = document.getElementById('pal_pid'); if (!ps) return;
+  S.selectedPid = ps.value;
+  S.jogos.forEach(j => { const s = document.getElementById('pal_' + j.id); if(s) s.value = j.palpites[ps.value] || ''; });
+};
+window.savePal = async jid => {
+  const ps = document.getElementById('pal_pid'); const vs = document.getElementById('pal_' + jid);
+  if (!ps || !vs) return;
+  S.selectedPid = ps.value;
+  const j = S.jogos.find(x => x.id === jid); if (!j) return;
+  if (vs.value) j.palpites[ps.value] = vs.value; else delete j.palpites[ps.value];
+  await saveToCloud();
+  vs.style.borderColor = '#16a34a'; setTimeout(() => { if(vs) vs.style.borderColor=''; }, 700);
+};
+</script>
+</body>
+</html>
